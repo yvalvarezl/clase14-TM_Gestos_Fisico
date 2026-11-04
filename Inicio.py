@@ -7,46 +7,55 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Estilos personalizados (CSS con texto visible)
+# 2. Estilos personalizados (CSS con rosados oscuros y texto legible)
 st.markdown("""
     <style>
     /* Fondo principal */
     .stApp {
-        background-color: #FAF5F8;
+        background-color: #FAF4F6 !important;
     }
+    
     /* Barra lateral */
     [data-testid="stSidebar"] {
-        background-color: #F3E8EE;
+        background-color: #F0E0E6 !important;
     }
-    /* Estilo de botones */
+
+    /* Forzar color oscuro en Títulos y Subtítulos de Streamlit */
+    h1, h2, h3, h4, h5, h6, span, p, label {
+        color: #3D2B32 !important;
+    }
+
+    /* Estilo de botones (Rosado más oscuro y llamativo) */
     .stButton>button {
-        background-color: #E8B4B8;
-        color: #2D2D2D !important;
-        border-radius: 12px;
-        border: none;
-        font-weight: bold;
-        padding: 0.5rem 1rem;
+        background-color: #D88A96 !important;
+        color: #FFFFFF !important;
+        border-radius: 12px !important;
+        border: none !important;
+        font-weight: bold !important;
+        padding: 0.6rem 1.2rem !important;
     }
     .stButton>button:hover {
-        background-color: #D89BA2;
-        color: white !important;
+        background-color: #C46D7B !important;
+        color: #FFFFFF !important;
+        box-shadow: 0px 4px 12px rgba(196, 109, 123, 0.4) !important;
     }
-    /* Tarjetas de contenido y texto oscuro */
+
+    /* Tarjetas de contenido con borde rosado oscuro */
     .css-card {
-        background-color: #FFFFFF;
-        padding: 1.5rem;
-        border-radius: 15px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1rem;
-        border: 1px solid #E8B4B8;
+        background-color: #FFFFFF !important;
+        padding: 1.5rem !important;
+        border-radius: 15px !important;
+        box-shadow: 0px 4px 12px rgba(180, 100, 120, 0.12) !important;
+        margin-bottom: 1rem !important;
+        border: 2px solid #D88A96 !important;
     }
     .css-card h3 {
-        color: #2D2D2D !important;
-        margin-bottom: 0.5rem;
+        color: #8C3A4D !important;
+        margin-bottom: 0.5rem !important;
     }
     .css-card p {
-        color: #4A4A4A !important;
-        font-size: 0.95rem;
+        color: #4A3A40 !important;
+        font-size: 0.95rem !important;
     }
     </style>
 """, unsafe_allow_html=True)
