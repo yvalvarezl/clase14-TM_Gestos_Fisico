@@ -7,7 +7,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Estilos personalizados (CSS)
+# 2. Estilos personalizados (CSS con texto visible)
 st.markdown("""
     <style>
     /* Fondo principal */
@@ -21,7 +21,7 @@ st.markdown("""
     /* Estilo de botones */
     .stButton>button {
         background-color: #E8B4B8;
-        color: #2D2D2D;
+        color: #2D2D2D !important;
         border-radius: 12px;
         border: none;
         font-weight: bold;
@@ -29,15 +29,24 @@ st.markdown("""
     }
     .stButton>button:hover {
         background-color: #D89BA2;
-        color: white;
+        color: white !important;
     }
-    /* Tarjetas de contenido */
+    /* Tarjetas de contenido y texto oscuro */
     .css-card {
         background-color: #FFFFFF;
         padding: 1.5rem;
         border-radius: 15px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
         margin-bottom: 1rem;
+        border: 1px solid #E8B4B8;
+    }
+    .css-card h3 {
+        color: #2D2D2D !important;
+        margin-bottom: 0.5rem;
+    }
+    .css-card p {
+        color: #4A4A4A !important;
+        font-size: 0.95rem;
     }
     </style>
 """, unsafe_allow_html=True)
