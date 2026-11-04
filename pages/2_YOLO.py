@@ -1,5 +1,6 @@
 import streamlit as st
 import torch
+import yaml
 from PIL import Image
 
 # 1. Configuración de la página
