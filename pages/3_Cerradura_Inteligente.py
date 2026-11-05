@@ -2,6 +2,8 @@ import streamlit as st
 import keras
 from PIL import Image, ImageOps
 import numpy as np
+import paho.mqtt.client as mqtt
+import json
 
 # 1. Configuración de la página
 st.set_page_config(
@@ -10,7 +12,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Estilos personalizados (Misma paleta de colores que Inicio.py)
+# 2. Estilos personalizados (Paleta Rosa Pastel y Blanco)
 st.markdown("""
     <style>
     /* Fondo principal */
@@ -63,13 +65,32 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Encabezado principal
+# 3. Función para enviar la orden por MQTT a Wokwi
+def enviar_comando_mqtt(accion):
+    """Envia un payload JSON {"gesto": "Abre"} o {"gesto": "Cierra"} al topic IMIA"""
+    try:
+        broker = "broker.mqttdashboard.com"
+        port = 1883
+        topic = "IMIA"
+        
+        # Crear mensaje JSON que espera ArduinoJson en Wokwi
+        payload = json.dumps({"gesto": accion})
+        
+        client = mqtt.Client()
+        client.connect(broker, port, 60)
+        client.publish(topic, payload)
+        client.disconnect()
+        st.toast(f"📡 Comando enviado por MQTT: {payload}", icon="✅")
+    except Exception as e:
+        st.error(f"Error al enviar mensaje MQTT: {e}")
+
+# 4. Encabezado principal
 st.title("🔐 Control de Cerradura Inteligente")
 st.write("Verificación de acceso presencial en tiempo real para control de apertura o cierre de puertas.")
 
 st.markdown("---")
 
-# 4. Organización en 2 columnas: Instrucciones y Cámara
+# 5. Organización en 2 columnas: Instrucciones y Cámara
 col_info, col_cam = st.columns([1, 1.2])
 
 with col_info:
@@ -78,8 +99,8 @@ with col_info:
             <h3>✨ Control de Acceso Visual</h3>
             <p>1. Ubícate frente a la cámara web.</p>
             <p>2. Toma una foto para validar tu identidad con el modelo de Keras.</p>
-            <p>3. Si el sistema detecta a <b>Carlos</b>, concederá el acceso y abrirá la cerradura.</p>
-            <p>4. Si no detecta presencia autorizada, la cerradura se mantendrá bloqueada.</p>
+            <p>3. Si el sistema detecta a <b>Carlos</b>, concederá el acceso y enviará la orden <b>"Abre"</b> a Wokwi.</p>
+            <p>4. Si no detecta presencia autorizada, enviará la orden <b>"Cierra"</b>.</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -91,7 +112,7 @@ with col_cam:
     """, unsafe_allow_html=True)
     img_file_buffer = st.camera_input("Capturar rostro para verificación")
 
-# 5. Procesamiento del modelo de Teachable Machine
+# 6. Procesamiento del modelo de Teachable Machine
 if img_file_buffer is not None:
     # Cargar el modelo guardado en el repositorio
     model = keras.models.load_model('keras_model.h5', compile=False)
@@ -117,11 +138,14 @@ if img_file_buffer is not None:
 
     st.markdown("---")
     
-    # 6. Evaluación de la etiqueta para conceder o denegar acceso
+    # 7. Evaluación de la etiqueta y emisión del comando por MQTT
     res_col1, res_col2 = st.columns(2)
     
     # Si la clase es "0 Carlos" (o contiene Carlos)
     if "0 Carlos" in class_name or "Carlos" in class_name:
+        # Enviar orden de apertura por MQTT
+        enviar_comando_mqtt("Abre")
+        
         with res_col1:
             st.markdown("""
                 <div class="css-card" style="border-color: #4CAF50 !important;">
@@ -134,11 +158,14 @@ if img_file_buffer is not None:
             st.markdown(f"""
                 <div class="css-card">
                     <h3>🟢 Acción del Servomotor</h3>
-                    <h2 style="color: #8C3A4D !important;">Abriendo Puerta...</h2>
+                    <h2 style="color: #8C3A4D !important;">Abriendo Puerta (180°)</h2>
                     <p>Confianza: <b>{confidence_score * 100:.1f}%</b></p>
                 </div>
             """, unsafe_allow_html=True)
     else:
+        # Enviar orden de cierre por MQTT
+        enviar_comando_mqtt("Cierra")
+        
         with res_col1:
             st.markdown("""
                 <div class="css-card" style="border-color: #E53935 !important;">
@@ -151,7 +178,7 @@ if img_file_buffer is not None:
             st.markdown(f"""
                 <div class="css-card">
                     <h3>🔴 Acción del Servomotor</h3>
-                    <h2 style="color: #8C3A4D !important;">Cerrando Puerta...</h2>
+                    <h2 style="color: #8C3A4D !important;">Cerrando Puerta (0°)</h2>
                     <p>Confianza: <b>{confidence_score * 100:.1f}%</b></p>
                 </div>
             """, unsafe_allow_html=True)
