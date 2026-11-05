@@ -11,3 +11,4 @@ torchvision==0.20.1
 ultralytics
 pyyaml
 setuptools
+paho-mqtt
